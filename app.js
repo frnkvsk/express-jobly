@@ -13,6 +13,11 @@ app.use(express.json());
 // add logging system
 app.use(morgan("tiny"));
 
+// get auth token for all routes
+//app.use(authenticateJWT)
+
+/** routes */
+
 /** 404 handler */
 
 app.use(function(req, res, next) {
