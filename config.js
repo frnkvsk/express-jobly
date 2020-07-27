@@ -13,10 +13,10 @@ const PORT = +process.env.PORT || 3000;
 // - else: 'jobly'
 
 // database username
-const databaseUserName = "postgres";
+const databaseUserName = "";
 
 // database user password
-const databaseUserPassword = "springboard";
+const databaseUserPassword = "";
 
 // port
 const port = "5432";
