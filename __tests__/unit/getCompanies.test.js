@@ -25,14 +25,14 @@ describe("getCompanies()", () => {
 
   it("test get all", async () => {
     let data = {search:"", min_employees:0, max_employees:0};
-    let query1 = sqlForGetCompanies(data);
+    let query1 = await sqlForGetCompanies(data);
     const result = await db.query(query1.query, query1.values);
     expect(result.rows.length).toEqual(4);
   });
 
   it("test get search = b", async () => {
     let data = {search:"b", min_employees:0, max_employees:0};
-    let query1 = sqlForGetCompanies(data);
+    let query1 = await sqlForGetCompanies(data);
     const result = await db.query(query1.query, query1.values);
     expect(result.rows.length).toEqual(1);
     expect(result.rows[0].companydata.handle).toMatch(/b/i);
@@ -40,14 +40,14 @@ describe("getCompanies()", () => {
 
   it("test get min_employees = 24", async () => {
     let data = {search:"", min_employees:24, max_employees:200};
-    let query1 = sqlForGetCompanies(data);
+    let query1 = await sqlForGetCompanies(data);
     const result = await db.query(query1.query, query1.values);
     expect(result.rows.length).toEqual(3);
   });
 
   it("test get max_employees = 76", async () => {
     let data = {search:"", min_employees:0, max_employees:76};
-    let query1 = sqlForGetCompanies(data);
+    let query1 = await sqlForGetCompanies(data);
     const result = await db.query(query1.query, query1.values);
     expect(result.rows.length).toEqual(3);
   });

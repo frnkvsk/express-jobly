@@ -14,20 +14,22 @@ function sqlForGetCompanies({search, min_employees, max_employees}) {
 
   let whereClause = "WHERE ";
   if(search.length) {
-    whereClause += `name ILIKE $${idx} OR handle ILIKE $${idx++}`;
-    idx++;
+    whereClause += `(name ILIKE $${idx} OR handle ILIKE $${idx++})`;
     values.push(`%${search}%`);
   }
   if(min_employees && max_employees) {
-    whereClause += `num_employees > $${idx++} AND num_employees < $${idx++}`;
+    if(whereClause.length > 6) whereClause += " AND ";
+    whereClause += ` num_employees > $${idx++} AND num_employees < $${idx++}`;
     values.push(min_employees);
     values.push(max_employees);
   }
   else if(min_employees) {
-    whereClause += `num_employees > $${idx++}`;
+    if(whereClause.length > 6) whereClause += " AND ";
+    whereClause += ` num_employees > $${idx++}`;
     values.push(min_employees);
   }
   else if(max_employees) {
+    if(whereClause.length > 6) whereClause += " AND ";
     whereClause += ` num_employees < $${idx++}`;
     values.push(max_employees);
   }

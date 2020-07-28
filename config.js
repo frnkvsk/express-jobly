@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const SECRET_KEY = process.env.SECRET_KEY || "test";
 
-const PORT = +process.env.PORT || 3000;
+const PORT = +process.env.PORT || 5432;
 
 // database is:
 //
@@ -13,15 +13,15 @@ const PORT = +process.env.PORT || 3000;
 // - else: 'jobly'
 
 // database username
-const databaseUserName = "";
+const databaseUserName = "postgres";
 
 // database user password
-const databaseUserPassword = "";
+const databaseUserPassword = "springboard";
 
 // port
-const port = "5432";
+// const port = "5432";
 
-let DB_URI = `postgres://${ databaseUserName }:${ databaseUserPassword }@localhost:${ port }/`;
+let DB_URI = `postgres://${ databaseUserName }:${ databaseUserPassword }@localhost:${ PORT }/`;
 
 if (process.env.NODE_ENV === "test") {
   DB_URI += "jobly_test";

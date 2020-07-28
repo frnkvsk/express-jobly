@@ -17,7 +17,9 @@ app.use(morgan("tiny"));
 //app.use(authenticateJWT)
 
 /** routes */
+const companyRoutes = require("./routes/companiesRoutes");
 
+app.use("/companies/", companyRoutes);
 /** 404 handler */
 
 app.use(function(req, res, next) {

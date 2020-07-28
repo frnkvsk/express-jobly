@@ -1,22 +1,19 @@
 const db = require("../../db");
 const sqlForPartialUpdate = require("../../helpers/partialUpdate");
+const Company = require("../../models/companies");
 
 describe("partialUpdate()", () => {
   let testCompany, test1;
+  const data1 = {handle: "compA", name: "CompanyA", num_employees: 1, description: "The Company", logo_url: ""};
   beforeEach(async () => {
-
     await db.query("DELETE FROM jobs");
     await db.query("DELETE FROM users");
-    await db.query("DELETE FROM companies");
-
-    testCompany = await db.query(`INSERT INTO companies (handle, name, num_employees, description)
-                    VALUES ('compA', 'CompanyA', 100, 'The test company')
-                    RETURNING *`);
-
+    await db.query("DELETE FROM companies");    
+    testCompany = await Company.post(data1);
   });
 
-  it("should generate a proper partial update query with just 1 field", () => {
-    test1 = sqlForPartialUpdate("companies", {"num_employees": 41}, "handle", testCompany.rows[0].handle);
+  it("should generate a proper partial update query with just 1 field", async () => {
+    test1 = await sqlForPartialUpdate("companies", {"num_employees": 41}, "handle", data1.handle);
     expect(test1.values).toContain(41);
     expect(test1.query).toMatch(/companies/);
     expect(test1.query).toMatch(/num_employees/);
