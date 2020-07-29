@@ -22,6 +22,7 @@ describe("partialUpdate()", () => {
   it("does query work on database", async () => {
     const result = await db.query(test1.query, test1.values);
     expect(result.rows[0].num_employees).toEqual(41);
+    expect(true).toEqual(true)
   });
 
 });

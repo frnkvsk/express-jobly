@@ -1,6 +1,9 @@
 const express = require("express");
 const router = new express.Router();
 const Company = require("../models/companies");
+const jsonschema = require("jsonschema");
+const companySchema = require("../companySchema.json");
+const ExpressError = require("../helpers/expressError");
 
 /**
  GET /companies
@@ -40,9 +43,15 @@ POST /companies
   This should return JSON of {company: companyData} 
 */
 router.post("/", async (req, res, next) => {
-  try {    
-    const result = await Company.post(req.body);
-    return res.json({ company: result })
+  try {   
+    const result = jsonschema.validate(req.body, companySchema); 
+    if(result.valid) {
+      const comp = await Company.post(req.body);
+      return res.json({ company: comp })
+    }
+    let listOfErrors = result.errors.map(e => e.stack);
+    let error = new ExpressError(listOfErrors, 400);
+    return next(error);    
   } catch (error) {
     next(error);
   }
@@ -56,7 +65,7 @@ GET /companies/[handle]
 */
 router.get("/:handle", async (req, res, next) => {
   try {
-    const result = await Company.getByHandle(req.params.handle);
+    const result = await Company.getByHandle(req.query.handle);
     return res.json({ company: result});
   } catch (error) {
     next(error);
@@ -70,9 +79,17 @@ PATCH /companies/[handle]
   This should return JSON of {company: companyData} 
 */
 router.patch("/", async (req, res, next) => {
+  let patchSchema = Object.assign({}, companySchema);
+  patchSchema["required"] = [];
   try {    
-    const result = await Company.patch(req.query.handle, req.body);
-    return res.json({ company: result });
+    const result = jsonschema.validate(req.body, patchSchema); 
+    if(result.valid) {
+      const comp = await Company.patch(req.query.handle, req.body);
+      return res.json({ company: comp })
+    }
+    let listOfErrors = result.errors.map(e => e.stack);
+    let error = new ExpressError(listOfErrors, 400);
+    return next(error);
   } catch (error) {
     next(error);
   }

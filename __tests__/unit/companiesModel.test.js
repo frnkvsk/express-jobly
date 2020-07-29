@@ -2,11 +2,17 @@
 
 const db = require("../../db");
 const Company = require("../../models/companies");
+const Job = require("../../models/jobs");
 
 const data1 = {handle: "compA", name: "CompanyA", num_employees: 1, description: "The Company", logo_url: ""};
 const data2 = {handle: "compB", name: "CompanyB", num_employees: 25, description: "The Company", logo_url: ""};
 const data3 = {handle: "compC", name: "CompanyC", num_employees: 75, description: "The Company", logo_url: ""};
 const data4 = {handle: "compD", name: "CompanyD", num_employees: 100, description: "The Company", logo_url: ""};
+
+const job1 = {title: "manager", salary: 1000, equity: 0.2, company_handle: "compA"};
+const job2 = {title: "boss", salary: 3000, equity: 0.4, company_handle: "compA"};
+const job3 = {title: "manager", salary: 7000, equity: 0.6, company_handle: "compA"};
+const job4 = {title: "manager", salary: 10000, equity: 0.9, company_handle: "compA"};
 
 describe("get( { search, min_employees, max_employees } )", () => {
 
@@ -25,6 +31,7 @@ describe("get( { search, min_employees, max_employees } )", () => {
     let data = {search:"", min_employees:0, max_employees:0};
     let result = await Company.get(data);
     expect(result.length).toEqual(4);
+    expect(true).toEqual(true)
   });
 
   it("test get search = b", async () => {
@@ -76,12 +83,21 @@ describe("getByHandle( handle )", () => {
     await db.query("DELETE FROM users");
     await db.query("DELETE FROM companies");    
     await Company.post(data1);
+    await Job.post(job1);
+    await Job.post(job2);
+    await Job.post(job3);
+    await Job.post(job4);
   });
 
   it("test getByHandle( handle )", async () => {
     // can get from database
     const result = await Company.getByHandle(data1.handle);
     expect(result.handle).toEqual(data1.handle);
+    expect(result.jobs.length).toEqual(4);
+    expect(result.jobs[0].job.company_handle).toEqual(data1.handle);
+    expect(result.jobs[1].job.company_handle).toEqual(data1.handle);
+    expect(result.jobs[2].job.company_handle).toEqual(data1.handle);
+    expect(result.jobs[3].job.company_handle).toEqual(data1.handle);
   });  
 
 });

@@ -5,6 +5,8 @@ const ExpressError = require("../helpers/expressError");
 const sqlForGetCompanies = require("../helpers/getCompanies");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
 
+const itemize = items => items.map((_,i) => '$'+(i+1)).join(",");
+
 class Company {
 
   static async get({search, min_employees, max_employees}) {
@@ -17,21 +19,33 @@ class Company {
     return resp.rows;
   }
 
-  static async post({handle, name, num_employees, description, logo_url}) {
-
-    const query = `INSERT INTO companies (handle, name, num_employees, description, logo_url)
-                  VALUES ($1, $2, $3, $4, $5)
-                  RETURNING *`;
-    const resp = await db.query(query, [handle, name, num_employees, description, logo_url]);
+  static async post(items) {
+    let keys = Object.keys(items);
+    let vals = Object.values(items);
+    // build query
+    const query = `INSERT INTO companies (${keys.join(",")}) VALUES (${itemize(keys)}) RETURNING *`;
+    const resp = await db.query(query, vals);
     return resp.rows[0];
   }
 
   static async getByHandle(handle) {
+    //{company: {...companyData, jobs: [job, ...]}}
     const query = `SELECT handle, name, num_employees, description, logo_url
                   FROM companies
                   WHERE handle = $1`;
     const resp = await db.query(query, [handle]);
-    return resp.rows[0];
+    const query2 = `SELECT json_build_object(
+                      'id', id,
+                      'title', title,
+                      'salary', salary,
+                      'equity', equity,
+                      'company_handle', company_handle,
+                      'date_posted', date_posted
+                    ) job
+                    FROM jobs
+                    WHERE company_handle = $1`;
+    const resp2 = await db.query(query2, [handle]);
+    return {...resp.rows[0], jobs: resp2.rows};
   }
 
   static async patch(handle, data) {  
@@ -42,9 +56,12 @@ class Company {
   }
 
   static async delete(handle) {
-    const query = `DELETE FROM companies
+    const query1 = `DELETE FROM jobs
+                  WHERE company_handle = $1`;
+    const resp1 = await db.query(query1, [handle]);
+    const query2 = `DELETE FROM companies
                   WHERE handle = $1`;
-    const resp = await db.query(query, [handle]);
+    const resp2 = await db.query(query2, [handle]);
     return {message: "Company deleted"};
   }
 }
