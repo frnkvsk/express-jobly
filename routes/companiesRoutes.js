@@ -2,7 +2,7 @@ const express = require("express");
 const router = new express.Router();
 const Company = require("../models/companies");
 const jsonschema = require("jsonschema");
-const companySchema = require("../companySchema.json");
+const companySchema = require("../helpers/companySchema.json");
 const ExpressError = require("../helpers/expressError");
 
 /**
@@ -37,6 +37,21 @@ router.get("/", async (req, res, next) => {
 });
 
 /**
+GET /companies/[handle]
+  This should return a single company found by its id.
+
+  This should return JSON of {company: companyData}
+*/
+router.get("/:handle", async (req, res, next) => {
+  try {
+    const result = await Company.getByHandle(req.query.handle);
+    return res.json({ company: result});
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
 POST /companies
   This should create a new company and return the newly created company.
 
@@ -52,21 +67,6 @@ router.post("/", async (req, res, next) => {
     let listOfErrors = result.errors.map(e => e.stack);
     let error = new ExpressError(listOfErrors, 400);
     return next(error);    
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
-GET /companies/[handle]
-  This should return a single company found by its id.
-
-  This should return JSON of {company: companyData}
-*/
-router.get("/:handle", async (req, res, next) => {
-  try {
-    const result = await Company.getByHandle(req.query.handle);
-    return res.json({ company: result});
   } catch (error) {
     next(error);
   }

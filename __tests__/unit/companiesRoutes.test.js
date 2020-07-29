@@ -86,6 +86,7 @@ describe("POST /companies/ data = {handle, name, num_employees, description, log
       .get(`/companies/`);
     expect(resp2.statusCode).toEqual(200);
     expect(resp2.body.companies.length).toEqual(1);
+    expect(resp2.body.companies[0].handle).toEqual(data1.handle);
   });  
 
 });

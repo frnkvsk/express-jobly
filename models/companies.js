@@ -16,16 +16,8 @@ class Company {
     // query is complicated so we get query from a helper file
     const query = await sqlForGetCompanies({search, min_employees, max_employees});
     const resp = await db.query(query.query, query.values);
+    // console.log("COMPANY => ",resp.rows)
     return resp.rows;
-  }
-
-  static async post(items) {
-    let keys = Object.keys(items);
-    let vals = Object.values(items);
-    // build query
-    const query = `INSERT INTO companies (${keys.join(",")}) VALUES (${itemize(keys)}) RETURNING *`;
-    const resp = await db.query(query, vals);
-    return resp.rows[0];
   }
 
   static async getByHandle(handle) {
@@ -47,7 +39,17 @@ class Company {
     const resp2 = await db.query(query2, [handle]);
     return {...resp.rows[0], jobs: resp2.rows};
   }
+  
+  static async post(items) {
+    let keys = Object.keys(items);
+    let vals = Object.values(items);
+    // build query
+    const query = `INSERT INTO companies (${keys.join(",")}) VALUES (${itemize(keys)}) RETURNING *`;
+    const resp = await db.query(query, vals);
+    return resp.rows[0];
+  }
 
+  // data = { fromValue: toValue, ... }
   static async patch(handle, data) {  
     // query is complicated so we get query from a helper file  
     const query = await sqlForPartialUpdate("companies", data, "handle", handle);

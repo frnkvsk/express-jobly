@@ -3,13 +3,15 @@ function sqlForGetCompanies({search, min_employees, max_employees}) {
   
   let idx = 1;
   let values = [];
-  let query = `SELECT json_build_object(
-                'handle', handle, 
-                'name', name, 
-                'num_employees', num_employees, 
-                'description', description,
-                'logo_url', logo_url
-              ) companyData
+  // let query2 = `SELECT json_build_object(
+  //               'handle', handle, 
+  //               'name', name, 
+  //               'num_employees', num_employees, 
+  //               'description', description,
+  //               'logo_url', logo_url
+  //             ) ''
+  //             FROM companies`;
+  let query = `SELECT handle, name, num_employees, description, logo_url
               FROM companies`;
 
   let whereClause = "WHERE ";

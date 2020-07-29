@@ -2,7 +2,7 @@ const express = require("express");
 const router = new express.Router();
 const Job = require("../models/jobs");
 const jsonschema = require("jsonschema");
-const jobSchema = require("../jobSchema.json");
+const jobSchema = require("../helpers/jobSchema.json");
 const ExpressError = require("../helpers/expressError");
 
 
@@ -82,7 +82,7 @@ router.patch("/", async (req, res, next) => {
   try {    
     const result = jsonschema.validate(req.body, patchSchema); 
     if(result.valid) {
-      const comp = await Job.patch(req.body, req.query.id);
+      const comp = await Job.patch(req.query.id, req.body);
       return res.json({ jobs: comp })
     }
     let listOfErrors = result.errors.map(e => e.stack);

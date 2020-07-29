@@ -38,7 +38,8 @@ describe("get( { search, min_employees, max_employees } )", () => {
     let data = {search:"b", min_employees:0, max_employees:0};
     let result = await Company.get(data);
     expect(result.length).toEqual(1);
-    expect(result[0].companydata.handle).toMatch(/b/i);
+    // console.log("result =>",result)
+    expect(result[0].handle).toMatch(/b/i);
   });
 
   it("test get min_employees = 24", async () => {

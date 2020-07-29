@@ -106,7 +106,27 @@ describe("getById( id )", () => {
   it("test getById( id )", async () => {
     const job = await Job.post(job1);
     const result = await Job.getById(job.id);
-    expect(result.id).toEqual(job.id);
+    expect(result[0].id).toEqual(job.id);
+  });  
+
+});
+
+describe("patch( id )", () => {
+
+  beforeEach(async () => {
+    await db.query("DELETE FROM jobs");
+    await db.query("DELETE FROM users");
+    await db.query("DELETE FROM companies");
+    
+    await Company.post(company1);
+  });
+
+  it("test patch( id )", async () => {
+    const job = await Job.post(job1);
+    // can patch
+    const patchData = {salary: 44};
+    const result = await Job.patch(job.id, patchData);
+    expect(+result.salary).toEqual(patchData.salary);
   });  
 
 });

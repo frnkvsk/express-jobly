@@ -35,7 +35,7 @@ describe("getCompanies()", () => {
     let query1 = await sqlForGetCompanies(data);
     const result = await db.query(query1.query, query1.values);
     expect(result.rows.length).toEqual(1);
-    expect(result.rows[0].companydata.handle).toMatch(/b/i);
+    expect(result.rows[0].handle).toMatch(/b/i);
   });
 
   it("test get min_employees = 24", async () => {
