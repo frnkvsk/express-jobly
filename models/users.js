@@ -1,12 +1,12 @@
 const db = require("../db");
 const ExpressError = require("../helpers/expressError");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
+const bcrypt = require("bcrypt");
+const { BCRYPT_WORK_FACTOR, SECRET_KEY } = require("../config");
 
 const itemize = items => items.map((_,i) => '$'+(i+1)).join(",");
 
 class User {
-  
-
 
   /*
   GET /users
@@ -47,8 +47,10 @@ class User {
       This should return JSON: {user: user}
     */
   static async post(data) {
+    data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
     let keys = Object.keys(data);
     let vals = Object.values(data);
+
     // build query
     const query = `INSERT INTO users (${keys.join(",")}) VALUES (${itemize(keys)}) RETURNING *`;
     const resp = await db.query(query, vals);
@@ -82,6 +84,19 @@ class User {
 
     const resp = await db.query(query, [username]);
     return {message: "User deleted"};
+  }
+
+  /*
+  Authenticate: 
+    is this username/password valid? Returns boolean. 
+  */
+  static async authenticate(username, password) { 
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
+    const resp = await db.query(
+      `SELECT password FROM users WHERE username = $1`,
+      [username]
+    );
+    return resp.rows.length && bcrypt.compare(password, resp.rows[0].password)
   }
 
 }

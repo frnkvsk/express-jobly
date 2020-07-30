@@ -1,20 +1,25 @@
 /** Express app for jobly. */
 
 const express = require("express");
-
+const cors = require("cors");
 const ExpressError = require("./helpers/expressError");
-
+const { authenticate } = require("./middleware/auth");
 const morgan = require("morgan");
 
 const app = express();
 
+// allow both form-encoded and json body parsing
 app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 
 // add logging system
 app.use(morgan("tiny"));
 
+// allow connections to all routes from any browser
+app.use(cors());
+
 // get auth token for all routes
-//app.use(authenticateJWT)
+app.use(authenticateJWT);
 
 /** routes */
 const companyRoutes = require("./routes/companiesRoutes");

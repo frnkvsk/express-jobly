@@ -3,6 +3,8 @@ const router = new express.Router();
 const User = require("../models/users");
 const jsonschema = require("jsonschema");
 const userSchema = require("../helpers/userSchema.json");
+const jwt = require("jsonwebtoken");
+const { SECRET_KEY } = require("../config");
 const ExpressError = require("../helpers/expressError");
 
 
@@ -15,7 +17,7 @@ GET /users
 router.get("/", async (req, res, next) => {
   try {
     const results = await User.get();
-    return res.json({ users: results })
+    return res.json({ "users": results })
   } catch (error) {
     next(error);
   }
@@ -30,7 +32,7 @@ GET /users/[username]
 router.get("/:username", async (req, res, next) => {
   try {
     const result = await User.getByUsername(req.query.username);
-    return res.json({ user: result});
+    return res.json({ "user": result});
   } catch (error) {
     next(error);
   }
@@ -46,8 +48,9 @@ router.post("/", async (req, res, next) => {
   try {   
     const result = jsonschema.validate(req.body, userSchema); 
     if(result.valid) {
-      const user = await User.post(req.body);
-      return res.json({ user: user })
+      const { username, is_admin } = await User.post(req.body);
+      let token = jwt.sign({ "username": username, "is_admin": is_admin}, SECRET_KEY);
+      return res.json({ "token": token });
     }
     let listOfErrors = result.errors.map(e => e.stack);
     let error = new ExpressError(listOfErrors, 400);
