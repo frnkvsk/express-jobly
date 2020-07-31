@@ -14,9 +14,7 @@ class Job {
 
     // query is complicated so we get query from a helper file
     const query = await sqlGetWhere({search, min_salary, min_equity});
-    // console.log("query => ", query)
     const resp = await db.query(query.query, query.values);
-    // console.log("JOB => ",resp.rows)
     return resp.rows;
   }
 
@@ -30,17 +28,20 @@ class Job {
   }
 
   static async post(data) {
+    delete data._token;
+    delete data.username;
     let keys = Object.keys(data);
     let vals = Object.values(data);
     // build query
     const query = `INSERT INTO jobs (${keys.join(",")}) VALUES (${itemize(keys)}) RETURNING *`;
-    // console.log("post query => ",query)
     const resp = await db.query(query, vals);
     return resp.rows[0];
   }
 
   // data = { fromValue: toValue, ... }
   static async patch(id, data) {
+    delete data._token;
+    delete data.username;
     // query is complicated so we get query from a helper file
     const query = await sqlForPartialUpdate("jobs", data, "id", id);
     const resp = await db.query(query.query, query.values);

@@ -17,16 +17,32 @@ const authenticateJWT = (req, res, next) => {
 
 // verify a user is currently logged in
 const ensureLoggedIn = (req, res, next) => {
-  if(!req.user) {
-    next({ status: 401, message: "Unauthorized"});
+  try {
+    if(req.user) 
+      next();
+  } catch (error) {
+    next(error);
   }
-  next();
 }
 
 // validate correct username
 const ensureCorrectUser = (req, res, next) => {
-  try {
-    if(req.user.user === req.params.username) {
+  try {    
+    if(req.user.username === req.query.username || 
+      req.user.username === req.body.username) {
+      next();
+    } else {
+      next({ status: 401, message: "Unauthorized" });
+    }
+  } catch (error) {
+    next(error);
+  }
+}
+
+// verify if user is an administrator
+const isAdmin = (req, res, next) => {
+  try {    
+    if(req.user.is_admin) {
       next();
     } else {
       next({ status: 401, message: "Unauthorized" });
@@ -39,5 +55,6 @@ const ensureCorrectUser = (req, res, next) => {
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
-  ensureCorrectUser
+  ensureCorrectUser,
+  isAdmin
 }

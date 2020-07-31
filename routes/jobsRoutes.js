@@ -4,7 +4,7 @@ const Job = require("../models/jobs");
 const jsonschema = require("jsonschema");
 const jobSchema = require("../helpers/jobSchema.json");
 const ExpressError = require("../helpers/expressError");
-
+const { ensureCorrectUser, ensureLoggedIn, isAdmin } = require("../middleware/auth");
 
 
 /*
@@ -16,7 +16,7 @@ GET /jobs
   min_equity: If the query string parameter is passed, a list of titles and company handles should be displayed that have an equity greater than the value of the query string parameter.
   It should return JSON of {jobs: [job, ...]}
 */
-router.get("/", async (req, res, next) => {
+router.get("/", ensureLoggedIn, async (req, res, next) => {
   try {
     const data = {
       search: "",
@@ -40,7 +40,7 @@ GET /jobs/[id]
 
   It should return JSON of {job: jobData}
 */
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", ensureLoggedIn, async (req, res, next) => {
   try {
     const result = await Job.getById(req.params.id);
     return res.json({ jobs: result});
@@ -55,7 +55,7 @@ POST /jobs
 
   It should return JSON of {job: jobData}
 */
-router.post("/", async (req, res, next) => {
+router.post("/", ensureLoggedIn, ensureCorrectUser, isAdmin, async (req, res, next) => {
   try {   
     const result = jsonschema.validate(req.body, jobSchema); 
     if(result.valid) {
@@ -76,7 +76,7 @@ PATCH /jobs/[id]
 
   It should return JSON of {job: jobData}
 */
-router.patch("/", async (req, res, next) => {
+router.patch("/", ensureLoggedIn, ensureCorrectUser, isAdmin, async (req, res, next) => {
   let patchSchema = Object.assign({}, jobSchema);
   patchSchema["required"] = [];
   try {    
@@ -99,7 +99,7 @@ DELETE /jobs/[id]
 
   It should return JSON of { message: "Job deleted" }
 */
-router.delete("/", async (req, res, next) => {
+router.delete("/", ensureLoggedIn, ensureCorrectUser, isAdmin, async (req, res, next) => {
   try {
     const result = await Job.delete(req.query.id);
     return res.json(result);

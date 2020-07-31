@@ -4,12 +4,14 @@ require("dotenv").config();
 
 const SECRET_KEY = process.env.SECRET_KEY || "test";
 
+const BCRYPT_WORK_FACTOR = 12;
+
 const PORT = +process.env.PORT || 5432;
 
 // database is:
 //
 // - on Heroku, get from env var DATABASE_URL
-// - in testing, 'jobly-test'
+// - in testing, 'jobly_test'
 // - else: 'jobly'
 
 // database username
@@ -32,5 +34,6 @@ if (process.env.NODE_ENV === "test") {
 module.exports = {
   SECRET_KEY,
   PORT,
-  DB_URI
+  DB_URI,
+  BCRYPT_WORK_FACTOR
 };

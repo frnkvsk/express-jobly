@@ -20,7 +20,6 @@ class User {
                   FROM users`;
     
     const resp = await db.query(query, []);
-    // console.log("USER => ", {users: resp.rows})
     return resp.rows;
   }
 
@@ -47,6 +46,7 @@ class User {
       This should return JSON: {user: user}
     */
   static async post(data) {
+    delete data._token;
     data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
     let keys = Object.keys(data);
     let vals = Object.values(data);
@@ -62,9 +62,11 @@ class User {
     This should update an existing user and return the updated user excluding the password.
 
     This should return JSON: {user: {username, first_name, last_name, email, photo_url}}
+
+    data = { fromValue: toValue, ... }
   */
-  // data = { fromValue: toValue, ... }
   static async patch(username, data) {
+    delete data._token;
     // query is complicated so we get query from a helper file
     const query = await sqlForPartialUpdate("users", data, "username", username);
 
@@ -81,7 +83,6 @@ class User {
   static async delete(username) {
     // build query
     const query = `DELETE FROM users WHERE username=$1`;
-
     const resp = await db.query(query, [username]);
     return {message: "User deleted"};
   }
@@ -93,10 +94,15 @@ class User {
   static async authenticate(username, password) { 
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
     const resp = await db.query(
-      `SELECT password FROM users WHERE username = $1`,
+      `SELECT password, is_admin FROM users WHERE username = $1`,
       [username]
     );
-    return resp.rows.length && bcrypt.compare(password, resp.rows[0].password)
+    let is_auth = false, is_admin = false;
+    if( resp.rows.length ) {
+       is_auth = bcrypt.compare(hashedPassword, resp.rows[0].password);
+       is_admin = resp.rows[0].is_admin;
+    }
+    return { "is_admin": is_admin, "is_auth": is_auth };
   }
 
 }

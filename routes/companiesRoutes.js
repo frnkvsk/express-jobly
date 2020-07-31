@@ -4,6 +4,7 @@ const Company = require("../models/companies");
 const jsonschema = require("jsonschema");
 const companySchema = require("../helpers/companySchema.json");
 const ExpressError = require("../helpers/expressError");
+const { ensureLoggedIn, ensureCorrectUser, isAdmin  } = require("../middleware/auth");
 
 /**
  GET /companies
@@ -19,7 +20,7 @@ const ExpressError = require("../helpers/expressError");
   
   This should return JSON of {companies: [companyData, ...]}
  */
-router.get("/", async (req, res, next) => {
+router.get("/", ensureLoggedIn, async (req, res, next) => {
   try {
     const data = {
       search: "",
@@ -42,7 +43,7 @@ GET /companies/[handle]
 
   This should return JSON of {company: companyData}
 */
-router.get("/:handle", async (req, res, next) => {
+router.get("/:handle", ensureLoggedIn, async (req, res, next) => {
   try {
     const result = await Company.getByHandle(req.query.handle);
     return res.json({ company: result});
@@ -57,8 +58,8 @@ POST /companies
 
   This should return JSON of {company: companyData} 
 */
-router.post("/", async (req, res, next) => {
-  try {   
+router.post("/", ensureLoggedIn, ensureCorrectUser, isAdmin, async (req, res, next) => {
+  try { 
     const result = jsonschema.validate(req.body, companySchema); 
     if(result.valid) {
       const comp = await Company.post(req.body);
@@ -78,7 +79,7 @@ PATCH /companies/[handle]
 
   This should return JSON of {company: companyData} 
 */
-router.patch("/", async (req, res, next) => {
+router.patch("/", ensureLoggedIn, ensureCorrectUser, isAdmin, async (req, res, next) => {
   let patchSchema = Object.assign({}, companySchema);
   patchSchema["required"] = [];
   try {    
@@ -101,7 +102,7 @@ DELETE /companies/[handle]
 
   This should return JSON of {message: "Company deleted"} 
  */
-router.delete("/", async (req, res, next) => {
+router.delete("/", ensureLoggedIn, ensureCorrectUser, isAdmin, async (req, res, next) => {
   try {
     const result = await Company.delete(req.query.handle);
     return res.json(result);

@@ -3,7 +3,7 @@
 const express = require("express");
 const cors = require("cors");
 const ExpressError = require("./helpers/expressError");
-const { authenticate } = require("./middleware/auth");
+const { authenticateJWT } = require("./middleware/auth");
 const morgan = require("morgan");
 
 const app = express();
@@ -18,6 +18,10 @@ app.use(morgan("tiny"));
 // allow connections to all routes from any browser
 app.use(cors());
 
+
+const login = require("./routes/login");
+app.use("/login", login);
+
 // get auth token for all routes
 app.use(authenticateJWT);
 
@@ -26,9 +30,11 @@ const companyRoutes = require("./routes/companiesRoutes");
 const jobRoutes = require("./routes/jobsRoutes");
 const userRoutes = require("./routes/usersRoutes");
 
+
 app.use("/companies/", companyRoutes);
 app.use("/jobs/", jobRoutes);
 app.use("/users/", userRoutes);
+
 
 
 /** 404 handler */

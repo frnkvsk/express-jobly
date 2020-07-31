@@ -6,7 +6,7 @@ const userSchema = require("../helpers/userSchema.json");
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 const ExpressError = require("../helpers/expressError");
-
+const { ensureCorrectUser, ensureLoggedIn } = require("../middleware/auth");
 
 /*
 GET /users
@@ -67,7 +67,7 @@ PATCH /users/[username]
 
   This should return JSON: {user: {username, first_name, last_name, email, photo_url}}
 */
-router.patch("/", async (req, res, next) => {
+router.patch("/", ensureLoggedIn, ensureCorrectUser, async (req, res, next) => {
   let patchSchema = Object.assign({}, userSchema);
   patchSchema["required"] = [];
   try {    
@@ -91,7 +91,7 @@ DELETE /users/[username]
 
   This should return JSON: { message: "User deleted" }
 */
-router.delete("/", async (req, res, next) => {
+router.delete("/", ensureLoggedIn, ensureCorrectUser, async (req, res, next) => {
   try {
     const result = await User.delete(req.query.usernames);
     return res.json(result);
