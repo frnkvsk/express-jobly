@@ -3,12 +3,15 @@
 const db = require("../../db");
 const Job = require("../../models/jobs");
 const Company = require("../../models/companies");
+const TestData = require("../../helpers/testData");
 
-const company1 = {handle: "compA", name: "CompanyA", num_employees: 1, description: "The Company", logo_url: ""};
-const job1 = {title: "manager", salary: 1000, equity: 0.2, company_handle: "compA"};
-const job2 = {title: "boss", salary: 3000, equity: 0.4, company_handle: "compA"};
-const job3 = {title: "manager", salary: 7000, equity: 0.6, company_handle: "compA"};
-const job4 = {title: "manager", salary: 10000, equity: 0.9, company_handle: "compA"};
+const company1 = Object.assign({}, TestData.company1);
+
+const job1 = Object.assign({}, TestData.job1);
+const job2 = Object.assign({}, TestData.job2);
+const job3 = Object.assign({}, TestData.job3);
+const job4 = Object.assign({}, TestData.job4);
+
 const data = {search:"", min_salary:0, min_equity:0};
 
 describe("get( table, items, objName, {search, min_salary, min_equity} )", () => {

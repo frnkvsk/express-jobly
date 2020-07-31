@@ -27,9 +27,10 @@ const ensureLoggedIn = (req, res, next) => {
 
 // validate correct username
 const ensureCorrectUser = (req, res, next) => {
+  // console.log("ENSURECORRECTUSER => ",req.body)
   try {    
     if(req.user.username === req.query.username || 
-      req.user.username === req.body.username) {
+      req.user.username === jwt.decode(req.body._token).username) {
       next();
     } else {
       next({ status: 401, message: "Unauthorized" });
@@ -41,8 +42,9 @@ const ensureCorrectUser = (req, res, next) => {
 
 // verify if user is an administrator
 const isAdmin = (req, res, next) => {
+  // console.log("ISADMIN => ",req.body)
   try {    
-    if(req.user.is_admin) {
+    if(jwt.decode(req.body._token).is_admin) {
       next();
     } else {
       next({ status: 401, message: "Unauthorized" });

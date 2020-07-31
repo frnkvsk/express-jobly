@@ -2,18 +2,34 @@
 
 const db = require("../../db");
 const User = require("../../models/users");
+const Job = require("../../models/jobs");
+const Company = require("../../models/companies");
+const TestData = require("../../helpers/testData");
 
-const user1 = {username: "user1", password: "pw1", first_name: "firstName1", last_name: "lastName1", email: "user1@user1.com", photo_url: "", is_admin: false};
-const user2 = {username: "user2", password: "pw2", first_name: "firstName2", last_name: "lastName2", email: "user2@user2.com", photo_url: "", is_admin: false};
-const user3 = {username: "user3", password: "pw3", first_name: "firstName3", last_name: "lastName3", email: "user3@user3.com", photo_url: "", is_admin: false};
-const user4 = {username: "user4", password: "pw4", first_name: "firstName4", last_name: "lastName4", email: "user4@user4.com", photo_url: "", is_admin: false};
+const company1 = Object.assign({}, TestData.company1);
+const company2 = Object.assign({}, TestData.company2);
+const company3 = Object.assign({}, TestData.company3);
+const company4 = Object.assign({}, TestData.company4);
 
+const job1 = Object.assign({}, TestData.job1);
+const job2 = Object.assign({}, TestData.job2);
+const job3 = Object.assign({}, TestData.job3);
+const job4 = Object.assign({}, TestData.job4);
+
+const user1 = Object.assign({}, TestData.user1);
+const user2 = Object.assign({}, TestData.user2);
+const user3 = Object.assign({}, TestData.user3);
+const user4 = Object.assign({}, TestData.user4);
+
+const application1 = Object.assign({}, TestData.application1);
+const application2 = Object.assign({}, TestData.application2);
+const application3 = Object.assign({}, TestData.application3);
+const application4 = Object.assign({}, TestData.application4);
 
 describe("get()", () => {
 
   beforeEach(async () => {
     await db.query("DELETE FROM users");
-    
     await User.post(user1);
     await User.post(user2);
     await User.post(user3);
@@ -44,19 +60,31 @@ describe("post()", () => {
 
 });
 
-describe("getByUsername( username )", () => {
+// describe("getByUsername( username )", () => {
 
-  beforeEach(async () => {
-    await db.query("DELETE FROM users");
-  });
+//   beforeEach(async () => {
+//     await db.query("DELETE FROM users");
+//     await db.query("DELETE FROM applications");
+//     await db.query("DELETE FROM jobs");
+//     await db.query("DELETE FROM companies");
+    
+//     await Company.post(company1);
+//     const job1 = await Job.post(job1);
+//     const job2 = await Job.post(job2);
+//     const job3 = await Job.post(job3);
+//     const job4 = await Job.post(job4);
+//     await User.post(user1);
+//     await Job.post(id, state);
 
-  it("test getByUsername( username )", async () => {
-    const user = await User.post(user1);
-    const result = await User.getByUsername(user.username);
-    expect(result.username).toEqual(user.username);
-  });  
+//   });
 
-});
+//   it("test getByUsername( username )", async () => {
+//     const user = await User.post(user1);
+//     const result = await User.getByUsername(user.username);
+//     expect(result.username).toEqual(user.username);
+//   });  
+
+// });
 
 describe("patch( username )", () => {
 

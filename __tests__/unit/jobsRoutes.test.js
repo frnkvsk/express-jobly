@@ -5,19 +5,18 @@ const Company = require("../../models/companies");
 const Job = require("../../models/jobs");
 const User = require("../../models/users");
 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwiaXNfYWRtaW4iOnRydWUsImlhdCI6MTU5NjEyMzQ3MH0.FSt31q9RLpb6xDjtEmBNMeoi5Z8qjbQEJQp5AscXkHY";
-const username = "user1";
-const password = "password1";
+const TestData = require("../../helpers/testData");
 
-const user1 = {"_token": token, username: "user1", password: password, first_name: "firstName1", last_name: "lastName1", email: "user1@user1.com", photo_url: "", is_admin: true};
+const token = TestData.token;
 
+const company1 = Object.assign({}, TestData.company1);
 
-const company1 = {"_token": token, "username": username, handle: "compA", name: "CompanyA", num_employees: 1, description: "The Company", logo_url: ""};
+const user1 = Object.assign({}, TestData.user1);
 
-const job1 = {"_token": token, "username": username, title: "manager", salary: 1000, equity: 0.2, company_handle: "compA"};
-const job2 = {"_token": token, "username": username, title: "boss", salary: 3000, equity: 0.4, company_handle: "compA"};
-const job3 = {"_token": token, "username": username, title: "manager", salary: 7000, equity: 0.6, company_handle: "compA"};
-const job4 = {"_token": token, "username": username, title: "manager", salary: 10000, equity: 0.9, company_handle: "compA"};
+const job1 = Object.assign({}, TestData.job1);
+const job2 = Object.assign({}, TestData.job2);
+const job3 = Object.assign({}, TestData.job3);
+const job4 = Object.assign({}, TestData.job4);
 
 describe("GET /jobs/ search, min_salary, min_equity", () => {
 
@@ -29,11 +28,7 @@ describe("GET /jobs/ search, min_salary, min_equity", () => {
     await User.post(user1);
     await request(app)
       .post(`/login/`)
-      .send({
-        "_token": token,
-        "username": username,
-        "password": password
-      });
+      .send({username: "user1", password: "password1"});
     await Company.post(Object.assign({},company1));
     await Job.post(Object.assign({},job1));
     await Job.post(Object.assign({},job2));
@@ -44,11 +39,7 @@ describe("GET /jobs/ search, min_salary, min_equity", () => {
   it("test get all", async () => {
     let resp = await request(app)
       .get(`/jobs/`)
-      .send({
-        "_token": token,
-        "username": username,
-        "password": password
-      });
+      .send(token);
     expect(resp.statusCode).toEqual(200);
     expect(resp.body.jobs.length).toEqual(4);
   });
@@ -56,11 +47,7 @@ describe("GET /jobs/ search, min_salary, min_equity", () => {
   it("test get search = b", async () => {
     let resp = await request(app)
       .get(`/jobs/?search=b`)
-      .send({
-        "_token": token,
-        "username": username,
-        "password": password
-      });
+      .send(token);
     expect(resp.statusCode).toEqual(200);
     expect(resp.body.jobs.length).toEqual(1);
   });
@@ -68,11 +55,7 @@ describe("GET /jobs/ search, min_salary, min_equity", () => {
   it("test get min_salary = 3000", async () => {
     let resp = await request(app)
       .get(`/jobs/?min_salary=3000`)
-      .send({
-        "_token": token,
-        "username": username,
-        "password": password
-      });
+      .send(token);
     expect(resp.statusCode).toEqual(200);
     expect(resp.body.jobs.length).toEqual(2);
   });
@@ -80,11 +63,7 @@ describe("GET /jobs/ search, min_salary, min_equity", () => {
   it("test get min_equity = 0.4", async () => {
     let resp = await request(app)
       .get(`/jobs/?min_equity=0.4`)
-      .send({
-        "_token": token,
-        "username": username,
-        "password": password
-      });
+      .send(token);
     expect(resp.statusCode).toEqual(200);
     expect(resp.body.jobs.length).toEqual(2);
   });
@@ -92,11 +71,7 @@ describe("GET /jobs/ search, min_salary, min_equity", () => {
   it("test get search = c, min_salary = 3000, min_equity = 0.6", async () => {
     let resp = await request(app)
       .get(`/jobs/?search=c&min_salary=3000&min_equity=0.6`)
-      .send({
-        "_token": token,
-        "username": username,
-        "password": password
-      });
+      .send(token);
     expect(resp.statusCode).toEqual(200);
     expect(resp.body.jobs.length).toEqual(1);
   });
@@ -124,11 +99,7 @@ describe("POST /jobs/ ", () => {
     // is data in database
     const resp2 = await request(app)
       .get(`/jobs/`)
-      .send({
-        "_token": token,
-        "username": username,
-        "password": password
-      });
+      .send(token);
     expect(resp2.statusCode).toEqual(200);
     expect(resp2.body.jobs.length).toEqual(1);
     expect(resp2.body.jobs[0].job.title).toEqual(job1.title)
@@ -152,11 +123,7 @@ describe("GET /jobs/:id", () => {
     // can get from database
     const resp = await request(app)
       .get(`/jobs/?id=${job.id}`)
-      .send({
-        "_token": token,
-        "username": username,
-        "password": password
-      });
+      .send(token);
     expect(resp.statusCode).toEqual(200);
     expect(resp.body.jobs.length).toEqual(1);
     expect(resp.body.jobs[0].job.title).toEqual(job1.title);
@@ -177,7 +144,7 @@ describe("PATCH /jobs/:id", () => {
 
   it("can update salary", async () => {
     const job = await Job.post(Object.assign({},job1));
-    const patchData = {"_token": token, "username": username, "salary": 100000.00};
+    const patchData = {"_token": token._token, "username": token.username, "salary": 100000.00};
     const resp = await request(app)
       .patch(`/jobs/?id=${job.id}`)
       .send(patchData);
@@ -201,11 +168,7 @@ describe("DELETE /jobs/:id", () => {
     const job = await Job.post(Object.assign({},job1));
     const resp = await request(app)
       .delete(`/jobs/?id=${job.id}`)
-      .send({
-        "_token": token,
-        "username": username,
-        "password": password
-      });
+      .send(token);
     expect(resp.statusCode).toEqual(200);
     expect(resp.body.message).toEqual("Job deleted");
   });  

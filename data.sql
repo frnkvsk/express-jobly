@@ -1,6 +1,8 @@
 \c jobly_test
 
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS applications;
+DROP TYPE IF EXISTS states;
 DROP TABLE IF EXISTS jobs;
 DROP TABLE IF EXISTS companies;
 
@@ -65,3 +67,26 @@ CREATE TABLE users (
   photo_url text,
   is_admin boolean DEFAULT 'f'
 );
+
+/*
+Create a table called applications which will contain the following columns:
+
+username: a primary key that is a foreign key to the username column in the users table
+job_id: a primary key that is a foreign key to the id column in the jobs table
+state: a non-nullable column that is text
+created_at: a datetime column that defaults to when the row was created
+*/
+CREATE TYPE states AS ENUM ('interested', 'applied', 'accepted', 'rejected');
+
+CREATE TABLE applications (
+  username text REFERENCES users (username),
+  job_id integer REFERENCES jobs (id),
+  state states NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (username, job_id)
+);
+
+
+/* const password1 = '$2y$12$uGR2gC.vKIC.MKF7deV6cOyV5fRBQ9.0hVcLHym6QgXSLG76mNZKy'; */
+-- INSERT INTO users (username, password, first_name, last_name, email, photo_url, is_admin)
+-- VALUES ('user1', '$2y$12$uGR2gC.vKIC.MKF7deV6cOyV5fRBQ9.0hVcLHym6QgXSLG76mNZKy', 'fname1', 'lname1', 'user1@user1.com', 'http://photo1.com', true);

@@ -2,7 +2,7 @@ const express = require("express");
 const router = new express.Router();
 const Job = require("../models/jobs");
 const jsonschema = require("jsonschema");
-const jobSchema = require("../helpers/jobSchema.json");
+const jobSchema = require("../schemas/jobSchema.json");
 const ExpressError = require("../helpers/expressError");
 const { ensureCorrectUser, ensureLoggedIn, isAdmin } = require("../middleware/auth");
 

@@ -2,7 +2,7 @@ const db = require("../db");
 const ExpressError = require("../helpers/expressError");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
 const bcrypt = require("bcrypt");
-const { BCRYPT_WORK_FACTOR, SECRET_KEY } = require("../config");
+const { BCRYPT_WORK_FACTOR } = require("../config");
 
 const itemize = items => items.map((_,i) => '$'+(i+1)).join(",");
 
@@ -108,3 +108,34 @@ class User {
 }
 
 module.exports = User;
+
+/**
+ * TODO:
+ * Implement Further Study - Job Applications
+ * 
+ * It is unclear what the requirements are defining.
+ */
+/*
+  GET /users/[username]
+    This should show all the fields for a user excluding the password. It should also include a column of jobs which are all of the jobs that user is associated with as well as the status of that application.
+    
+    It should return JSON of:
+    { 
+      username, password, first_name, last_name, email, photo_url, is_admin, 
+      jobs: { name, id, title, salary, equity, state, created_at }
+    }
+  */
+  // static async getByUsername(username) {
+  //   // build query
+  //   const query = `SELECT u.username, u.password, u.first_name, u.last_name, u.email, u.photo_url, 
+  //                 u.is_admin, json_build_object('name': c.name, 'id': j.id, 'title': j.title, 'salary': j.salary, 
+  //                 'equity': j.equity, 'state': j.state, 'created_at': j.created_at) jobs
+                  
+  //                 FROM users u, applications a, companies c, jobs j
+  //                 WHERE a.username = $1
+  //                 AND a.username = u.username 
+  //                 AND a.job_id = j.id 
+  //                 AND j.company_handle = c.handle`;
+  //   const resp = await db.query(query, [username]);
+  //   return { "user": resp.rows };
+  // }
