@@ -16,7 +16,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "jest --config ./__tests__/unit/jest.config.js",
+    "test": "jest -i",
     "start": "node server.js"
   },
   "repository": {

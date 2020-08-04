@@ -12,20 +12,26 @@ GET /jobs
   This route should list all the titles and company handles for all jobs, ordered by the most recently posted jobs. It should also allow for the following query string parameters
 
   search: If the query string parameter is passed, a filtered list of titles and company handles should be displayed based on the search term and if the job title includes it.
+
   min_salary: If the query string parameter is passed, titles and company handles should be displayed that have a salary greater than the value of the query string parameter.
+
   min_equity: If the query string parameter is passed, a list of titles and company handles should be displayed that have an equity greater than the value of the query string parameter.
   It should return JSON of {jobs: [job, ...]}
 */
-router.get("/", ensureLoggedIn, async (req, res, next) => {
+router.get("/:data", ensureLoggedIn, async (req, res, next) => {
   try {
-    const data = {
-      search: "",
-      min_salary: 0,
-      min_equity: 0
-    }
-    if(req.query.search) data["search"] = req.query.search;
-    if(req.query.min_salary) data["min_salary"] = +req.query.min_salary;
-    if(req.query.min_equity) data["min_equity"] = +req.query.min_equity;
+    // const data = {
+    //   search: "",
+    //   min_salary: 0,
+    //   min_equity: 0
+    // }
+    // if(req.params.search) data["search"] = req.params.search;
+    // if(req.params.min_salary) data["min_salary"] = +req.params.min_salary;
+    // if(req.params.min_equity) data["min_equity"] = +req.params.min_equity;
+    let data = {search:"", min_salary:0, min_equity:0};
+    if(req.params.data)
+     data = req.params.data;
+    console.log("data => ",data)
     const results = await Job.get(data);
     return res.json({ jobs: results });
   } catch (error) {
@@ -76,13 +82,13 @@ PATCH /jobs/[id]
 
   It should return JSON of {job: jobData}
 */
-router.patch("/", ensureLoggedIn, ensureCorrectUser, isAdmin, async (req, res, next) => {
+router.patch("/:id", ensureLoggedIn, ensureCorrectUser, isAdmin, async (req, res, next) => {
   let patchSchema = Object.assign({}, jobSchema);
   patchSchema["required"] = [];
   try {    
     const result = jsonschema.validate(req.body, patchSchema); 
     if(result.valid) {
-      const comp = await Job.patch(req.query.id, req.body);
+      const comp = await Job.patch(req.params.id, req.body);
       return res.json({ jobs: comp })
     }
     let listOfErrors = result.errors.map(e => e.stack);
@@ -99,9 +105,9 @@ DELETE /jobs/[id]
 
   It should return JSON of { message: "Job deleted" }
 */
-router.delete("/", ensureLoggedIn, ensureCorrectUser, isAdmin, async (req, res, next) => {
+router.delete("/:id", ensureLoggedIn, ensureCorrectUser, isAdmin, async (req, res, next) => {
   try {
-    const result = await Job.delete(req.query.id);
+    const result = await Job.delete(req.params.id);
     return res.json(result);
   } catch (error) {
     next(error);

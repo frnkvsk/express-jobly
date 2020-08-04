@@ -11,7 +11,7 @@ const authenticateJWT = (req, res, next) => {
     req.user = payload;
     next();
   } catch (error) {
-    next(error);
+    next({ status: 401, message: "Unauthorized" });
   }
 }
 
@@ -21,13 +21,12 @@ const ensureLoggedIn = (req, res, next) => {
     if(req.user) 
       next();
   } catch (error) {
-    next(error);
+    next({ status: 401, message: "Unauthorized" });
   }
 }
 
 // validate correct username
 const ensureCorrectUser = (req, res, next) => {
-  // console.log("ENSURECORRECTUSER => ",req.body)
   try {    
     if(req.user.username === req.query.username || 
       req.user.username === jwt.decode(req.body._token).username) {
@@ -36,13 +35,12 @@ const ensureCorrectUser = (req, res, next) => {
       next({ status: 401, message: "Unauthorized" });
     }
   } catch (error) {
-    next(error);
+    next({ status: 401, message: "Unauthorized" });
   }
 }
 
 // verify if user is an administrator
 const isAdmin = (req, res, next) => {
-  // console.log("ISADMIN => ",req.body)
   try {    
     if(jwt.decode(req.body._token).is_admin) {
       next();
@@ -50,7 +48,7 @@ const isAdmin = (req, res, next) => {
       next({ status: 401, message: "Unauthorized" });
     }
   } catch (error) {
-    next(error);
+    next({ status: 401, message: "Unauthorized" });
   }
 }
 
