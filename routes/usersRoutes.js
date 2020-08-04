@@ -31,7 +31,7 @@ GET /users/[username]
 */
 router.get("/:username", async (req, res, next) => {
   try {
-    const result = await User.getByUsername(req.query.username);
+    const result = await User.getByUsername(req.params.username);
     return res.json({ "user": result});
   } catch (error) {
     next(error);
@@ -67,13 +67,13 @@ PATCH /users/[username]
 
   This should return JSON: {user: {username, first_name, last_name, email, photo_url}}
 */
-router.patch("/", ensureLoggedIn, ensureCorrectUser, async (req, res, next) => {
+router.patch("/:username", ensureLoggedIn, ensureCorrectUser, async (req, res, next) => {
   let patchSchema = Object.assign({}, userSchema);
   patchSchema["required"] = [];
   try {    
     const result = jsonschema.validate(req.body, patchSchema); 
     if(result.valid) {
-      const user = await User.patch(req.query.username, req.body);
+      const user = await User.patch(req.params.username, req.body);
       return res.json({ "user": user })
     }
     let listOfErrors = result.errors.map(e => e.stack);
@@ -91,9 +91,9 @@ DELETE /users/[username]
 
   This should return JSON: { message: "User deleted" }
 */
-router.delete("/", ensureLoggedIn, ensureCorrectUser, async (req, res, next) => {
+router.delete("/:username", ensureLoggedIn, ensureCorrectUser, async (req, res, next) => {
   try {
-    const result = await User.delete(req.query.usernames);
+    const result = await User.delete(req.params.usernames);
     return res.json(result);
   } catch (error) {
     next(error);
