@@ -18,20 +18,16 @@ GET /jobs
   min_equity: If the query string parameter is passed, a list of titles and company handles should be displayed that have an equity greater than the value of the query string parameter.
   It should return JSON of {jobs: [job, ...]}
 */
-router.get("/:data", ensureLoggedIn, async (req, res, next) => {
+router.get("/", ensureLoggedIn, async (req, res, next) => {
   try {
-    // const data = {
-    //   search: "",
-    //   min_salary: 0,
-    //   min_equity: 0
-    // }
-    // if(req.params.search) data["search"] = req.params.search;
-    // if(req.params.min_salary) data["min_salary"] = +req.params.min_salary;
-    // if(req.params.min_equity) data["min_equity"] = +req.params.min_equity;
-    let data = {search:"", min_salary:0, min_equity:0};
-    if(req.params.data)
-     data = req.params.data;
-    console.log("data => ",data)
+    const data = {
+      search: "",
+      min_salary: 0,
+      min_equity: 0
+    }
+    if(req.query.search) data["search"] = req.query.search;
+    if(req.query.min_salary) data["min_salary"] = +req.query.min_salary;
+    if(req.query.min_equity) data["min_equity"] = +req.query.min_equity;
     const results = await Job.get(data);
     return res.json({ jobs: results });
   } catch (error) {
@@ -86,10 +82,10 @@ router.patch("/:id", ensureLoggedIn, ensureCorrectUser, isAdmin, async (req, res
   let patchSchema = Object.assign({}, jobSchema);
   patchSchema["required"] = [];
   try {    
-    const result = jsonschema.validate(req.body, patchSchema); 
-    if(result.valid) {
-      const comp = await Job.patch(req.params.id, req.body);
-      return res.json({ jobs: comp })
+    const valid = jsonschema.validate(req.body, patchSchema); 
+    if(valid.valid) {
+      const result = await Job.patch(req.params.id, req.body);
+      return res.json({ jobs: result })
     }
     let listOfErrors = result.errors.map(e => e.stack);
     let error = new ExpressError(listOfErrors, 400);

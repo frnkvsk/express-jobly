@@ -39,7 +39,13 @@ describe("GET /companies/ search, min_employees, max_employees", () => {
     await Company.post(company4);
   });
 
-  it("test get all", async () => {
+  it("should fail get all, no token", async () => {
+    let resp = await request(app)
+      .get(`/companies/`);
+    expect(resp.statusCode).toEqual(401);
+  });
+
+  it("should get all", async () => {
     let resp = await request(app)
       .get(`/companies/`)
       .send(token);
@@ -85,7 +91,25 @@ describe("GET /companies/ search, min_employees, max_employees", () => {
 
 describe("POST /companies/ data = {handle, name, num_employees, description, logo_url}", () => {
   
-  it("can add a new company", async () => {
+  it("should fail add a new company, no token", async () => {
+    await db.query("DELETE FROM companies"); 
+    await db.query("DELETE FROM users");
+    await User.post(user1);
+    await request(app)
+      .post(`/login/`)
+      .send({username: "user1", password: "password1"});
+    // can post to database
+    const comp1 = Object.assign({}, company1);
+    // erase token
+    comp1._token = "";
+    const resp = await request(app)
+      .post(`/companies/`)
+      .send(comp1);
+
+    expect(resp.statusCode).toEqual(401);
+  });  
+
+  it("should add a new company", async () => {
     await db.query("DELETE FROM companies"); 
     await db.query("DELETE FROM users");
     await User.post(user1);
@@ -124,7 +148,14 @@ describe("GET /companies/:handle", () => {
     await Job.post(job4);
   });
 
-  it("can get by company handle", async () => {
+  it("should fail get by company handle, no token", async () => {
+    // can get from database
+    const resp = await request(app)
+      .get(`/companies/handle?handle=${company1.handle}`);
+    expect(resp.statusCode).toEqual(401);
+  });  
+
+  it("should get by company handle", async () => {
     // can get from database
     const resp = await request(app)
       .get(`/companies/handle?handle=${company1.handle}`)
@@ -150,7 +181,15 @@ describe("PATCH /companies/:handle", () => {
     await Company.post(Object.assign({}, company1));
   });
 
-  it("can update num_employees", async () => {
+  it("should fail update num_employees, no token", async () => {
+    const patchData = {"_token": "", "username": token.username, "num_employees": 4440};
+    const resp = await request(app)
+      .patch(`/companies/?handle=${company1.handle}`)
+      .send(patchData);
+    expect(resp.statusCode).toEqual(401);
+  });  
+
+  it("should update num_employees", async () => {
     const patchData = {"_token": token._token, "username": token.username, "num_employees": 4440};
     const resp = await request(app)
       .patch(`/companies/?handle=${company1.handle}`)
@@ -170,7 +209,13 @@ describe("DELETE /companies/:handle", () => {
     await Company.post(Object.assign({}, company1));
   });
 
-  it("can delete company by handle", async () => {
+  it("should fail delete company by handle, no token", async () => {
+    const resp = await request(app)
+      .delete(`/companies/?handle=${company1.handle}`);
+    expect(resp.statusCode).toEqual(401);
+  });
+
+  it("should delete company by handle", async () => {
     const resp = await request(app)
       .delete(`/companies/?handle=${company1.handle}`)
       .send(token);
