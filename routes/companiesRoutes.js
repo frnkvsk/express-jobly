@@ -27,9 +27,9 @@ router.get("/", ensureLoggedIn, async (req, res, next) => {
       min_employees: 0,
       max_employees: 0
     }
-    if(req.query.search) data["search"] = req.query.search;
-    if(req.query.min_employees) data["min_employees"] = +req.query.min_employees;
-    if(req.query.max_employees) data["max_employees"] = +req.query.max_employees;
+    if(req.query.hasOwnProperty("search")) data["search"] = req.query.search;
+    if(req.query.hasOwnProperty("min_employees")) data["min_employees"] = +req.query.min_employees;
+    if(req.query.hasOwnProperty("max_employees")) data["max_employees"] = +req.query.max_employees;
     const results = await Company.get(data);
     return res.json({ companies: results });
   } catch (error) {

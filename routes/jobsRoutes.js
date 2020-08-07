@@ -25,9 +25,9 @@ router.get("/", ensureLoggedIn, async (req, res, next) => {
       min_salary: 0,
       min_equity: 0
     }
-    if(req.query.search) data["search"] = req.query.search;
-    if(req.query.min_salary) data["min_salary"] = +req.query.min_salary;
-    if(req.query.min_equity) data["min_equity"] = +req.query.min_equity;
+    if(req.query.hasOwnProperty("search")) data["search"] = req.query.search;
+    if(req.query.hasOwnProperty("min_salary")) data["min_salary"] = +req.query.min_salary;
+    if(req.query.hasOwnProperty("min_equity")) data["min_equity"] = +req.query.min_equity;
     const results = await Job.get(data);
     return res.json({ jobs: results });
   } catch (error) {
