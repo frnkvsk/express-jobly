@@ -8,6 +8,7 @@ const BCRYPT_WORK_FACTOR = 12;
 
 const PORT = +process.env.PORT || 5432;
 
+const DB_PORT = 5000;
 // database is:
 //
 // - on Heroku, get from env var DATABASE_URL
@@ -23,7 +24,7 @@ const databaseUserPassword = "springboard";
 // port
 // const port = "5432";
 
-let DB_URI = `postgres://${ databaseUserName }:${ databaseUserPassword }@localhost:${ PORT }/`;
+let DB_URI = `postgres://${ databaseUserName }:${ databaseUserPassword }@localhost:${ DB_PORT }/`;
 
 if (process.env.NODE_ENV === "test") {
   DB_URI += "jobly_test";

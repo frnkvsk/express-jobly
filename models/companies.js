@@ -50,7 +50,7 @@ class Company {
     return resp.rows[0];
   }
 
-  // data = { fromValue: toValue, ... }
+  // data = { column: newValue, ... }
   static async patch(handle, data) {  
     delete data._token;
     delete data.username;
